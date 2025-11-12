@@ -1,0 +1,113 @@
+﻿[07/11/2025 10:25:03] ✅ Server started on port 5000...
+[07/11/2025 10:25:06] 🔌 A new client connected.
+[07/11/2025 10:25:06] 👤 hi connected.
+[07/11/2025 10:25:08] 🔌 A new client connected.
+[07/11/2025 10:25:08] 👤 hu connected.
+[07/11/2025 10:25:12] hu: hhhh
+[07/11/2025 10:26:19] ❌ hi disconnected.
+[07/11/2025 10:26:21] ❌ hu disconnected.
+[07/11/2025 10:41:27] ✅ Server started on port 5000...
+[07/11/2025 10:41:30] 🛑 Server stopped.
+[07/11/2025 10:41:41] ✅ Server started on port 5000...
+[07/11/2025 10:41:43] 🔌 A new client connected.
+[07/11/2025 10:41:43] 👤 dsf connected.
+[07/11/2025 11:04:12] ✅ Server started on port 5000...
+[07/11/2025 11:04:17] 🔌 A new client connected.
+[07/11/2025 11:04:17] 👤 sanh connected.
+[07/11/2025 11:04:21] 🔌 A new client connected.
+[07/11/2025 11:04:22] 👤 tài connected.
+[07/11/2025 11:04:26] 🔌 A new client connected.
+[07/11/2025 11:04:32] 🔌 A new client connected.
+[07/11/2025 11:04:32] 👤 quân connected.
+[07/11/2025 11:04:46] sanh: hi
+[07/11/2025 11:04:57] [Private] sanh → tài: hihihi
+[07/11/2025 11:05:15] ❌ tài disconnected.
+[07/11/2025 11:05:52] ❌ sanh disconnected.
+[07/11/2025 11:09:04] ✅ Server started on port 5000...
+[07/11/2025 11:09:09] 🔌 A new client connected.
+[07/11/2025 11:09:09] 👤 sanh connected.
+[07/11/2025 11:09:33] ✅ Server started on port 5000...
+[07/11/2025 11:09:36] 🔌 A new client connected.
+[07/11/2025 11:09:36] 👤 sanh connected.
+[07/11/2025 11:23:06] ❌ sanh disconnected.
+[07/11/2025 11:32:50] ✅ Server started on port 5000...
+[07/11/2025 11:32:54] 🔌 A new client connected.
+[07/11/2025 11:32:54] 👤 sa connected.
+[07/11/2025 11:33:03] 🔌 A new client connected.
+[07/11/2025 11:33:03] 👤 saa connected.
+[07/11/2025 11:33:06] saa: hu
+[07/11/2025 11:37:04] ✅ Server started on port 5000...
+[07/11/2025 11:37:10] 🔌 A new client connected.
+[07/11/2025 11:37:10] 👤 sa connected.
+[07/11/2025 11:37:14] 🔌 A new client connected.
+[07/11/2025 11:37:14] 👤 saa connected.
+[07/11/2025 11:37:19] 📎 sa gửi file 'hi.jpeg' đến ALL
+[07/11/2025 11:39:24] 🔌 A new client connected.
+[07/11/2025 11:41:55] ✅ Server started on port 5000...
+[07/11/2025 11:42:02] 🔌 A new client connected.
+[07/11/2025 11:42:02] 👤 sanh connected.
+[07/11/2025 11:42:42] 🔌 A new client connected.
+[07/11/2025 11:42:42] 👤 tài connected.
+[07/11/2025 11:42:48] 📎 tài gửi file 'pngtree-the-clover-flower-in-the-green-field-trifolium-repens-image_15917506.jpg' đến ALL
+[07/11/2025 11:43:41] 🔌 A new client connected.
+[07/11/2025 11:47:11] 🔌 A new client connected.
+[07/11/2025 11:47:11] 👤 hu connected.
+[07/11/2025 11:47:18] [Private] sanh → hu: jj
+[07/11/2025 11:51:19] ✅ Server started on port 5000...
+[07/11/2025 11:51:22] 🔌 A new client connected.
+[07/11/2025 11:51:22] 👤 sanh connected.
+[07/11/2025 11:51:27] 🔌 A new client connected.
+[07/11/2025 11:51:27] 👤 tài connected.
+[07/11/2025 11:51:33] 🔌 A new client connected.
+[07/11/2025 11:51:38] 🔌 A new client connected.
+[07/11/2025 11:51:38] 👤 hi connected.
+[07/11/2025 11:51:49] sanh: hi
+[07/11/2025 11:51:56] [Private] sanh → hi: jjjj
+[07/11/2025 11:52:30] 📎 sanh gửi file 'hi.jpeg' đến ALL
+[07/11/2025 11:52:56] 📎 sanh gửi file 'pngtree-the-clover-flower-in-the-green-field-trifolium-repens-image_15917506.jpg' đến ALL
+[07/11/2025 11:53:13] 📎 hi gửi file 'pngtree-the-clover-flower-in-the-green-field-trifolium-repens-image_15917506.jpg' đến ALL
+[07/11/2025 11:53:35] ❌ hi disconnected.
+[07/11/2025 11:53:43] 🔌 A new client connected.
+[07/11/2025 11:53:43] 👤 hi connected.
+[07/11/2025 11:54:17] ❌ hi disconnected.
+[07/11/2025 11:54:24] 🔌 A new client connected.
+[07/11/2025 11:54:24] 👤 hi connected.
+[07/11/2025 11:54:48] ❌ hi disconnected.
+[07/11/2025 11:58:39] ✅ Server started on port 5000...
+[07/11/2025 11:58:42] 🔌 A new client connected.
+[07/11/2025 11:58:42] 👤 sa connected.
+[07/11/2025 11:58:45] 🔌 A new client connected.
+[07/11/2025 11:58:45] 👤 hu connected.
+[07/11/2025 11:58:49] 🔌 A new client connected.
+[07/11/2025 11:58:49] 👤 hi connected.
+[07/11/2025 11:58:52] hu: hhh
+[07/11/2025 11:59:01] [Private] hu → hi: fff
+[07/11/2025 11:59:05] 📎 hu gửi file 'ngủ.png' đến ALL
+[07/11/2025 11:59:34] 🔌 A new client connected.
+[07/11/2025 11:59:39] Unknown: hhh
+[07/11/2025 12:00:17] Unknown: ttt
+[07/11/2025 12:05:09] 📎 hu gửi file 'hi.jpeg' đến ALL
+[07/11/2025 12:05:26] ❌ hu disconnected.
+[07/11/2025 20:40:05] ✅ Server started on port 5000...
+[07/11/2025 20:40:18] 🔌 A new client connected.
+[07/11/2025 20:40:18] 👤 na connected.
+[07/11/2025 20:40:25] 🔌 A new client connected.
+[07/11/2025 20:40:52] 🔌 A new client connected.
+[07/11/2025 20:41:00] 🔌 A new client connected.
+[07/11/2025 20:41:00] 👤 ni connected.
+[07/11/2025 20:41:12] ni: hh
+[07/11/2025 20:41:51] 🔌 A new client connected.
+[07/11/2025 20:41:51] 👤 nu connected.
+[07/11/2025 20:41:56] nu: hh
+[07/11/2025 20:42:04] [Private] nu → ni: ggg
+[07/11/2025 20:42:23] 📎 ni gửi file 'hi.jpeg' đến ALL
+[07/11/2025 20:54:28] ✅ Server started on port 5000...
+[07/11/2025 20:54:33] 🔌 A new client connected.
+[07/11/2025 20:54:33] 👤 sa connected.
+[07/11/2025 20:54:36] 🔌 A new client connected.
+[07/11/2025 20:54:36] 👤 dd connected.
+[07/11/2025 20:54:42] 🔌 A new client connected.
+[07/11/2025 20:54:47] 🔌 A new client connected.
+[07/11/2025 20:54:47] 👤 ff connected.
+[07/11/2025 20:54:53] sa: ff
+[07/11/2025 20:55:02] [Private] sa → dd: gfff
