@@ -1,4 +1,4 @@
-program.cs bên chat server
+
 using System;
 using System.Windows.Forms;
 
