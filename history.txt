@@ -1,0 +1,28 @@
+﻿[15/11/2025 14:04:56] ✅ Server started on port 5000...
+[15/11/2025 14:06:10] 🔌 A new client connected.
+[15/11/2025 14:06:10] 👤 Bảo Long connected.
+[15/11/2025 14:06:59] 🔌 A new client connected.
+[15/11/2025 14:06:59] 👤 Nhi connected.
+[15/11/2025 14:07:04] Bảo Long: hello
+[15/11/2025 14:07:10] Nhi: hello
+[15/11/2025 14:07:58] 📎 Bảo Long gửi file 'G2k-wzrawAAa-3e.png' đến ALL
+[15/11/2025 14:08:38] 📎 Bảo Long gửi file 'MiniGame_RockPaperScissors.rar' đến ALL
+[15/11/2025 14:08:46] Nhi: nhận đc rồi
+[15/11/2025 14:10:55] ❌ Nhi disconnected.
+[15/11/2025 14:11:31] 🔌 A new client connected.
+[15/11/2025 14:11:31] 👤 nhi connected.
+[15/11/2025 14:12:40] nhi: kakakakak
+[15/11/2025 14:12:58] Bảo Long: baolorrq
+[15/11/2025 14:13:15] 🛑 Server stopped.
+[15/11/2025 14:13:15] ❌ Bảo Long disconnected.
+[15/11/2025 14:13:15] ❌ nhi disconnected.
+[15/11/2025 14:13:30] ✅ Server started on port 5000...
+[15/11/2025 14:15:54] ✅ Server started on port 5000...
+[15/11/2025 14:15:56] 🔌 A new client connected.
+[15/11/2025 14:15:56] 👤 Long connected.
+[15/11/2025 14:15:59] 🔌 A new client connected.
+[15/11/2025 14:15:59] 👤 Nhi connected.
+[15/11/2025 14:16:07] Long: Xin chào
+[15/11/2025 14:16:12] Nhi: chào bạn
+[15/11/2025 14:16:19] Long: bánh xèo
+[15/11/2025 14:16:23] Nhi: ehehhe

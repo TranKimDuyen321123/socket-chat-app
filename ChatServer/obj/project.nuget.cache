@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "OHY/gO4ScF4=",
+  "dgSpecHash": "ylMkV2X3ob0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\admin\\Downloads\\ChatAppTCP\\ChatAppTCP\\ChatServer\\ChatServer.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "D:\\socket-chat-app\\ChatServer\\ChatServer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.22\\microsoft.netcore.app.ref.8.0.22.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.22\\microsoft.windowsdesktop.app.ref.8.0.22.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.22\\microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512",
+    "C:\\Users\\Admin\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.22\\microsoft.netcore.app.host.win-x64.8.0.22.nupkg.sha512"
+  ],
   "logs": []
 }

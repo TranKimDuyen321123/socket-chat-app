@@ -147,6 +147,34 @@ namespace ChatClient
             // =============================
             this.Controls.AddRange(new Control[] { txtLog, headerPanel, footerPanel });
         }
+        
+        // ===================================================================
+        // ✅ HÀM HỖ TRỢ ĐỌC ĐẦY ĐỦ SỐ BYTE YÊU CẦU (LPP)
+        // ===================================================================
+        int ReadAll(NetworkStream stream, byte[] buffer, int offset, int size)
+        {
+            int totalRead = 0;
+            while (totalRead < size)
+            {
+                int read = stream.Read(buffer, offset + totalRead, size - totalRead);
+                if (read == 0) return 0; // Kết nối bị đóng
+                totalRead += read;
+            }
+            return totalRead;
+        }
+
+        // ===================================================================
+        // ✅ HÀM HỖ TRỢ GỬI DỮ LIỆU CÓ TIỀN TỐ ĐỘ DÀI (LPP)
+        // ===================================================================
+        void SendWithLengthPrefix(NetworkStream s, byte[] data)
+        {
+            if (data == null || data.Length == 0) return;
+            // 1. Gửi 4 byte độ dài
+            byte[] lengthBytes = BitConverter.GetBytes(data.Length);
+            s.Write(lengthBytes, 0, 4); 
+            // 2. Gửi dữ liệu
+            s.Write(data, 0, data.Length); 
+        }
 
         // =====================================================
         // ✅ SỰ KIỆN NHẤN NÚT CONNECT → GỬI TÊN LÊN SERVER
@@ -158,14 +186,12 @@ namespace ChatClient
 
             try
             {
-                // 1) Tạo kết nối TCP đến server
                 client = new TcpClient("127.0.0.1", 5000);
                 stream = client.GetStream();
 
-                // 2) Gửi tên lên server
+                // Gửi tên lên server bằng LPP
                 SendMessage($"NAME:{txtName.Text}");
 
-                // 3) Khởi chạy luồng nhận tin nhắn
                 receiveThread = new Thread(ReceiveMessages) { IsBackground = true };
                 receiveThread.Start();
 
@@ -197,7 +223,7 @@ namespace ChatClient
         }
 
         // =====================================================
-        // ✅ NHẤN "FILE" → GỬI FILE
+        // ✅ NHẤN "FILE" → GỬI FILE (Đã dùng LPP cho HEADER và loại bỏ Thread.Sleep)
         // =====================================================
         private void BtnAttach_Click(object sender, EventArgs e)
         {
@@ -211,25 +237,27 @@ namespace ChatClient
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                string targetName = PromptForTarget("Nhập tên người nhận (Mặc định là 'ALL' để gửi công khai):", "Gửi File");
+                if (targetName == null) return; 
+                if (string.IsNullOrWhiteSpace(targetName)) targetName = "ALL";
+                
                 string filePath = ofd.FileName;
                 string fileName = System.IO.Path.GetFileName(filePath);
                 byte[] fileBytes = System.IO.File.ReadAllBytes(filePath);
 
-                // HEADER gửi trước để server biết dung lượng file
-                string header = $"FILE|{txtName.Text}|ALL|{fileName}|{fileBytes.Length}";
+                // HEADER gửi trước để server biết dung lượng file: FILE|sender|target|filename|size
+                string header = $"FILE|{txtName.Text}|{targetName}|{fileName}|{fileBytes.Length}";
                 byte[] headerBytes = Encoding.UTF8.GetBytes(header);
 
                 try
                 {
-                    // Gửi HEADER
-                    stream.Write(headerBytes, 0, headerBytes.Length);
+                    // Gửi HEADER BẰNG LPP (Thay thế stream.Write + Thread.Sleep)
+                    SendWithLengthPrefix(stream, headerBytes); 
 
-                    Thread.Sleep(50); // tránh dính gói
-
-                    // Gửi BYTE FILE
+                    // Gửi BYTE FILE (Server sẽ dùng fileSize trong header để đọc)
                     stream.Write(fileBytes, 0, fileBytes.Length);
 
-                    AppendChat($"📎 Bạn đã gửi file '{fileName}'");
+                    AppendChat($"📎 Bạn đã gửi file '{fileName}' đến {targetName.ToUpper()}.");
                 }
                 catch
                 {
@@ -239,14 +267,43 @@ namespace ChatClient
         }
 
         // =====================================================
-        // ✅ GỬI CHUỖI DATA QUA SOCKET
+        // ✅ HÀM HỖ TRỢ HIỂN THỊ HỘP THOẠI NHẬP TÊN NGƯỜI NHẬN
+        // =====================================================
+        private string PromptForTarget(string prompt, string title)
+        {
+            Form promptForm = new Form()
+            {
+                Width = 400,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = title,
+                StartPosition = FormStartPosition.CenterParent,
+                MinimizeBox = false,
+                MaximizeBox = false
+            };
+            
+            Label label = new Label() { Left = 50, Top = 20, Text = prompt, AutoSize = true };
+            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 280, Text = "ALL" }; 
+            Button confirmation = new Button() { Text = "Gửi", DialogResult = DialogResult.OK, Left = 200, Top = 80 };
+            Button cancel = new Button() { Text = "Hủy", DialogResult = DialogResult.Cancel, Left = 280, Top = 80 };
+
+            promptForm.AcceptButton = confirmation;
+            promptForm.CancelButton = cancel;
+
+            promptForm.Controls.AddRange(new Control[] { label, textBox, confirmation, cancel });
+
+            return promptForm.ShowDialog() == DialogResult.OK ? textBox.Text.Trim() : null;
+        }
+
+        // =====================================================
+        // ✅ GỬI CHUỖI DATA QUA SOCKET (Đã dùng LPP)
         // =====================================================
         private void SendMessage(string msg)
         {
             try
             {
                 byte[] data = Encoding.UTF8.GetBytes(msg);
-                stream.Write(data, 0, data.Length);
+                SendWithLengthPrefix(stream, data);
             }
             catch
             {
@@ -255,23 +312,30 @@ namespace ChatClient
         }
 
         // =====================================================
-        // ✅ LUỒNG NHẬN TIN TỪ SERVER (GỬI FILE + CHAT)
+        // ✅ LUỒNG NHẬN TIN TỪ SERVER (Đã dùng LPP)
         // =====================================================
         private void ReceiveMessages()
         {
-            byte[] buffer = new byte[1024];
+            byte[] lengthBuffer = new byte[4]; // Buffer 4 bytes cho Length Prefix
 
             try
             {
-                while (true)
+                // Vòng lặp chính đọc Length Prefix (4 bytes)
+                while (ReadAll(stream, lengthBuffer, 0, 4) > 0)
                 {
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead <= 0) continue;
+                    // Chuyển 4 bytes thành kích thước gói tin
+                    int messageSize = BitConverter.ToInt32(lengthBuffer, 0);
 
-                    string msg = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    if (messageSize <= 0) continue; 
+
+                    // Đọc toàn bộ gói tin/header theo kích thước đã xác định
+                    byte[] messageBuffer = new byte[messageSize];
+                    if (ReadAll(stream, messageBuffer, 0, messageSize) == 0) break; // Lỗi đọc nội dung
+
+                    string msg = Encoding.UTF8.GetString(messageBuffer);
 
                     // ==========================================
-                    // ✅ 1) NHẬN FILE
+                    // ✅ 1) NHẬN FILE (File Header đã được nhận bằng LPP)
                     // ==========================================
                     if (msg.StartsWith("FILE|"))
                     {
@@ -285,27 +349,18 @@ namespace ChatClient
 
                             // Tạo buffer để đọc toàn bộ file
                             byte[] fileBuffer = new byte[fileSize];
-                            int totalRead = 0;
-
-                            // Đọc đến khi đủ fileSize
-                            while (totalRead < fileSize)
-                            {
-                                int read = stream.Read(fileBuffer, totalRead, fileSize - totalRead);
-                                if (read == 0) break;
-                                totalRead += read;
-                            }
+                            
+                            // Đọc file data bằng ReadAll
+                            if (ReadAll(stream, fileBuffer, 0, fileSize) == 0) break;
 
                             // Lưu file vào Documents
-                            string savePath = System.IO.Path.Combine(
-                                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                                fileName
-                            );
+                            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            string savePath = System.IO.Path.Combine(documentsPath, fileName);
 
                             System.IO.File.WriteAllBytes(savePath, fileBuffer);
 
                             AppendChat($"📥 Nhận file '{fileName}' từ {senderName}. Lưu tại: {savePath}");
                         }
-
                         continue;
                     }
 
@@ -317,7 +372,6 @@ namespace ChatClient
                         MessageBox.Show("Tên này đã được sử dụng. Vui lòng nhập tên khác.",
                                         "Trùng tên", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                        // Ngắt kết nối
                         stream.Close();
                         client.Close();
 
