@@ -18,11 +18,11 @@ namespace ChatServer
         FlowLayoutPanel pnlClients;
 
         // ====== Các biến mạng ======
-        TcpListener listener;                     
-        List<TcpClient> clients = new List<TcpClient>();     
-        Dictionary<TcpClient, string> clientNames = new Dictionary<TcpClient, string>(); 
+        TcpListener listener;                      // Lắng nghe client mới
+        List<TcpClient> clients = new List<TcpClient>();     // Danh sách client đang kết nối
+        Dictionary<TcpClient, string> clientNames = new Dictionary<TcpClient, string>(); // Ánh xạ Client → Tên người dùng
 
-        bool isRunning = false;                  
+        bool isRunning = false;                   // Trạng thái server
 
         public Form1()
         {
