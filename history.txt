@@ -26,3 +26,35 @@
 [15/11/2025 14:16:12] Nhi: chào bạn
 [15/11/2025 14:16:19] Long: bánh xèo
 [15/11/2025 14:16:23] Nhi: ehehhe
+[01/12/2025 22:15:19] ✅ Server started on port 5000...
+[01/12/2025 22:16:28] 🔌 A new client connected.
+[01/12/2025 22:16:28] 👤 baolqwe connected.
+[01/12/2025 22:16:31] 🔌 A new client connected.
+[01/12/2025 22:16:31] 👤 bgeqgwegqwe connected.
+[01/12/2025 22:16:43] baolqwe: ccccccccc
+[01/12/2025 22:16:51] bgeqgwegqwe: chui ccc
+[01/12/2025 22:17:01] 🛑 Server stopped.
+[04/12/2025 01:44:32] ✅ Server started on port 5000...
+[04/12/2025 01:44:36] 🔌 A new client connected.
+[04/12/2025 01:44:36] 👤 long connected.
+[04/12/2025 01:44:41] 🔌 A new client connected.
+[04/12/2025 01:44:46] 🔌 A new client connected.
+[04/12/2025 01:44:46] 👤 long1 connected.
+[04/12/2025 01:44:57] 👥 long joined room 'Nhom1'.
+[04/12/2025 01:45:13] 👥 long1 joined room 'Nhom1'.
+[04/12/2025 01:45:16] [Group Nhom1] long: 1111
+[04/12/2025 01:45:21] [Group Nhom1] long1: 11111
+[04/12/2025 01:45:47] 🔌 A new client connected.
+[04/12/2025 01:45:47] 👤 1111 connected.
+[04/12/2025 01:45:55] 👥 1111 joined room 'nhom1'.
+[04/12/2025 01:46:01] [Group nhom1] 1111: hello
+[04/12/2025 01:46:14] [Group nhom1] 1111: 11
+[04/12/2025 01:46:19] [Group Nhom1] long: 1
+[04/12/2025 01:46:24] ❌ 1111 disconnected.
+[04/12/2025 01:46:28] [Group Nhom1] long: 11111
+[04/12/2025 01:46:31] [Group Nhom1] long1: 111111
+[04/12/2025 01:46:35] [Group Nhom1] long: 3323
+[04/12/2025 01:46:38] [Group Nhom1] long1: 2313
+[04/12/2025 01:47:13] [Private] long → long1: hello
+[04/12/2025 01:47:17] ❌ long disconnected.
+[04/12/2025 01:47:18] ❌ long1 disconnected.

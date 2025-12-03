@@ -21,6 +21,9 @@ namespace ChatServer
         TcpListener listener;                      // Lắng nghe client mới
         List<TcpClient> clients = new List<TcpClient>();     // Danh sách client đang kết nối
         Dictionary<TcpClient, string> clientNames = new Dictionary<TcpClient, string>(); // Ánh xạ Client → Tên người dùng
+        
+        // Quản lý phòng chat: Tên phòng -> Danh sách Client
+        Dictionary<string, HashSet<TcpClient>> chatRooms = new Dictionary<string, HashSet<TcpClient>>();
 
         bool isRunning = false;                   // Trạng thái server
 
@@ -169,6 +172,7 @@ namespace ChatServer
                 foreach (var c in clients) c.Close();
                 clients.Clear();
                 clientNames.Clear();
+                chatRooms.Clear();
             }
 
             pnlClients.Controls.Clear();
@@ -358,7 +362,75 @@ namespace ChatServer
                         continue;
                     }
 
-                    // Nếu không phải file + không phải tên → xử lý tin nhắn
+                    // ===================================================================
+                    // THAM GIA PHÒNG CHAT (JOIN:RoomName)
+                    // ===================================================================
+                    if (message.StartsWith("JOIN:"))
+                    {
+                        string roomName = message.Substring(5).Trim();
+                        string userName = clientNames[client];
+
+                        lock (chatRooms)
+                        {
+                            if (!chatRooms.ContainsKey(roomName))
+                            {
+                                chatRooms[roomName] = new HashSet<TcpClient>();
+                            }
+                            chatRooms[roomName].Add(client);
+                        }
+
+                        SendToClient($"✅ You joined group '{roomName}'.", client);
+                        AppendLog($"👥 {userName} joined room '{roomName}'.");
+                        continue;
+                    }
+
+                    // ===================================================================
+                    // TIN NHẮN TRONG PHÒNG (ROOM:RoomName:Message)
+                    // ===================================================================
+                    if (message.StartsWith("ROOM:"))
+                    {
+                        // Format: ROOM:RoomName:Content
+                        // Tìm vị trí dấu : thứ 2 (sau ROOM:)
+                        int firstColon = message.IndexOf(':');
+                        int secondColon = message.IndexOf(':', firstColon + 1);
+
+                        if (secondColon > firstColon)
+                        {
+                            string roomName = message.Substring(firstColon + 1, secondColon - firstColon - 1);
+                            string content = message.Substring(secondColon + 1);
+                            string senderName = clientNames[client];
+
+                            lock (chatRooms)
+                            {
+                                if (chatRooms.ContainsKey(roomName) && chatRooms[roomName].Contains(client))
+                                {
+                                    string groupMsg = $"[Group {roomName}] {senderName}: {content}";
+                                    foreach (var member in chatRooms[roomName])
+                                    {
+                                        // Gửi cho các thành viên khác trong nhóm
+                                        if (member != client)
+                                        {
+                                            SendToClient(groupMsg, member);
+                                        }
+                                        else 
+                                        {
+                                            // Gửi lại cho chính mình (optional) để hiển thị
+                                            // SendToClient(groupMsg, member); 
+                                            // Nhưng client đã tự hiển thị rồi nên thường không cần
+                                        }
+                                    }
+                                    AppendLog(groupMsg);
+                                }
+                                else
+                                {
+                                    SendToClient($"⚠️ You are not in room '{roomName}'. Join first.", client);
+                                }
+                            }
+                        }
+                        continue;
+                    }
+
+                    // Nếu không phải file + không phải tên + không phải lệnh nhóm → xử lý tin nhắn thường
                     ProcessMessage(message, client);
                 }
             }
@@ -375,6 +447,15 @@ namespace ChatServer
                     {
                         clients.Remove(client);
                         clientNames.Remove(client);
+                        
+                        // Xóa khỏi tất cả các phòng
+                        lock (chatRooms)
+                        {
+                            foreach (var room in chatRooms.Values)
+                            {
+                                room.Remove(client);
+                            }
+                        }
                     }
 
                     UpdateClientList();
