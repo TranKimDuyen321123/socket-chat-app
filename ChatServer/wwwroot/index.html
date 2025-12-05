@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zalo Chat Ultimate - Chọn Phiên Bản</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --primary: #764ba2;
+            --secondary: #667eea;
+            --bg-light: #f4f7f6;
+            --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            background: var(--bg-light);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-strong);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .option-box {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+
+        /* Web Option */
+        .btn-web {
+            background: var(--secondary);
+            color: white;
+            border: 2px solid transparent;
+        }
+
+        .btn-web:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Desktop Option */
+        .btn-desktop {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-desktop:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Chào mừng!</h1>
+    <p>Vui lòng chọn phiên bản Chat bạn muốn sử dụng.</p>
+
+    <div class="option-box">
+        <a href="chat_client_web.html" class="btn btn-web">
+            <i class="fas fa-globe"></i> Sử dụng Phiên bản Web (Trình duyệt)
+        </a>
+
+        <a href="/downloads/ChatClient.exe" class="btn btn-desktop" download="ChatClient_Desktop.exe">
+            <i class="fas fa-download"></i> Tải về Ứng dụng Desktop
+        </a>
+    </div>
+    <p style="margin-top: 20px; font-size: 0.85rem; color: #aaa;">Ứng dụng Desktop mang lại trải nghiệm tối ưu hơn.</p>
+</div>
+</body>
+</html>

@@ -58,3 +58,13 @@
 [04/12/2025 01:47:13] [Private] long → long1: hello
 [04/12/2025 01:47:17] ❌ long disconnected.
 [04/12/2025 01:47:18] ❌ long1 disconnected.
+[04/12/2025 19:22:27] ✅ Server started on port 5000...
+[04/12/2025 19:22:32] 🔌 A new client connected.
+[04/12/2025 19:22:32] 👤 Baolong connected.
+[04/12/2025 19:22:35] Baolong: 1111
+[04/12/2025 19:23:13] 🔌 A new client connected.
+[04/12/2025 19:23:13] 👤 blong1 connected.
+[04/12/2025 19:23:28] blong1: 111
+[04/12/2025 19:23:31] Baolong: 111
+[04/12/2025 19:23:33] ❌ blong1 disconnected.
+[04/12/2025 19:23:34] ❌ Baolong disconnected.

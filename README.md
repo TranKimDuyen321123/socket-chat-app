@@ -1,77 +1,64 @@
-🚀 Hướng Dẫn Vận Hành Ứng Dụng Zalo Chat Socket
-Ứng dụng này bao gồm hai dự án: ChatServer và ChatClient.
+🚀 Hướng Dẫn Vận Hành Zalo Chat (Docker & Local)
+=======================================================
 
-I. Chuẩn bị (Build)
-Bạn cần Build mã nguồn trước khi chạy. Lệnh này được thực hiện trong Terminal của VS Code, tại thư mục gốc chứa file .sln.
+Dự án này gồm 2 phần:
+1.  **ChatServer & Database**: Nên chạy bằng **Docker** để tự động thiết lập môi trường và CSDL SQL Server.
+2.  **ChatClient**: Là ứng dụng Windows Desktop (WinForms), phải chạy trực tiếp trên máy tính (**không chạy trong Docker**).
 
-Sử dụng lệnh sau để khôi phục các gói NuGet và biên dịch mã nguồn:
+---
+
+## CÁCH 1: Chạy Bằng Docker (Khuyên Dùng)
+Cách này giúp bạn không cần cài đặt SQL Server thủ công.
+
+### Bước 1: Khởi động Server & Database
+Mở Terminal tại thư mục gốc của dự án và chạy lệnh:
 
 ```powershell
-# Sử dụng đường dẫn tuyệt đối (Full Path) cho lệnh dotnet
-& "C:\Program Files\dotnet\dotnet.exe" build
+docker-compose up --build
 ```
-(Nếu bạn thấy thông báo "Build succeeded" (Build thành công), bạn có thể chuyển sang Bước II.)
 
-II. Khởi chạy Ứng dụng (Run)
-Để chạy Server và Client song song, bạn cần mở các Terminal riêng biệt cho mỗi ứng dụng.
+*   Lệnh này sẽ tải SQL Server, tạo Database và khởi chạy Chat Server.
+*   Chờ đến khi thấy thông báo **"Application started. Press Ctrl+C to shut down."** hoặc **Server đang lắng nghe tại port 5000**.
 
-1. Khởi động Server (Terminal Bắt buộc)
-   Server phải được khởi động đầu tiên.
+### Bước 2: Chạy Client (Ứng dụng Chat)
+Vì Client là ứng dụng giao diện Windows, bạn cần mở một Terminal **mới** (giữ Terminal Docker đang chạy) và gõ:
 
-   Mở Terminal mới (Terminal 1).
+```powershell
+dotnet run --project ChatClient
+```
 
-   Chạy Server bằng lệnh:
+*   Bạn có thể mở nhiều cửa sổ Terminal và chạy lệnh này nhiều lần để tạo nhiều người dùng chat với nhau.
 
-   ```powershell
-   & "C:\Program Files\dotnet\dotnet.exe" run --project ChatServer
-   ```
-   Cửa sổ 💻 Zalo Chat Server sẽ hiện ra. Nhấn nút ▶ Start Server.
+---
 
-   Giữ cửa sổ này mở.
+## CÁCH 2: Chạy Thủ Công (Local - Không dùng Docker)
+Dùng cách này nếu bạn không cài Docker và đã có sẵn SQL Server cài trên máy.
 
-2. Khởi động Client (Terminal 2, 3,...)
-   Sau khi Server hoạt động, bạn có thể khởi chạy Client.
+### Bước 1: Cấu hình Database
+*   Mở file `ChatServer/appsettings.json` (nếu chưa có thì tạo mới hoặc sửa trong `Program.cs`).
+*   Đảm bảo `ConnectionStrings` trỏ đúng tới SQL Server trên máy bạn.
 
-   Mở Terminal mới (Terminal 2).
+### Bước 2: Chạy Server
+```powershell
+dotnet run --project ChatServer
+```
 
-   Chạy Client bằng lệnh:
+### Bước 3: Chạy Client
+```powershell
+dotnet run --project ChatClient
+```
 
-   ```powershell
-   & "C:\Program Files\dotnet\dotnet.exe" run --project ChatClient
-   ```
-   Cửa sổ 💬 Zalo Chat Client sẽ hiện ra. Nhập tên và nhấn Kết nối.
+---
 
-   **Khởi động Client Thứ Hai (Terminal 3)**
-   Để kiểm tra chức năng chat, bạn cần ít nhất hai Client. Lặp lại bước 2 trong một Terminal thứ ba, sử dụng một tên người dùng khác.
+## 🛠 Các Lệnh Thường Dùng
 
-III. Các Tính Năng Mới: Chat Riêng và Chat Nhóm
+| Tác vụ | Lệnh (PowerShell / CMD) |
+| :--- | :--- |
+| **Build Code** | `dotnet build` |
+| **Chạy Docker** | `docker-compose up --build` |
+| **Tắt Docker** | `docker-compose down` |
+| **Chạy Client** | `dotnet run --project ChatClient` |
 
-Ứng dụng hỗ trợ các chế độ chat sau:
-
-1.  **Chat Chung (Public Chat)**
-    *   **Cách dùng:** Chọn chế độ "Public" từ danh sách. Đây là chế độ mặc định.
-    *   Mọi tin nhắn bạn gửi sẽ được gửi đến tất cả mọi người trong phòng chat.
-
-2.  **Chat Riêng (Private Chat)**
-    *   **Cách dùng:**
-        1.  Chọn chế độ "Private" từ danh sách.
-        2.  Nhập tên chính xác của người bạn muốn gửi tin vào ô nhập liệu bên cạnh.
-        3.  Nhập tin nhắn và gửi.
-    *   Tin nhắn sẽ được định dạng là `[Tôi → NgườiNhận]: Nội dung` ở phía bạn và chỉ người nhận mới thấy.
-
-3.  **Chat Nhóm (Group Chat)**
-    *   **Cách dùng:**
-        1.  **Tham gia nhóm:**
-            *   Chọn chế độ "Group".
-            *   Nhập tên nhóm bạn muốn tham gia vào ô nhập liệu (ví dụ: `dev_team`, `gaming`).
-            *   Nhấn nút "Tham gia". Server sẽ xác nhận bạn đã vào nhóm.
-            *   Các thành viên khác có thể tham gia cùng nhóm bằng cách làm tương tự.
-        2.  **Gửi tin vào nhóm:**
-            *   Sau khi đã tham gia, đảm bảo chế độ "Group" và tên nhóm vẫn còn trong ô.
-            *   Nhập tin nhắn và gửi.
-            *   Tin nhắn sẽ được gửi đến tất cả các thành viên đang online trong nhóm đó.
-
-IV. Gửi File
-*   Việc gửi file hiện tại hỗ trợ chế độ **Public** và **Private**.
-*   Để gửi riêng cho ai đó, hãy chọn chế độ "Private" và nhập tên người nhận trước khi bấm nút "📎".
-*   Để gửi cho tất cả mọi người, chọn chế độ "Public".
+## ⚠️ Lưu Ý Quan Trọng
+*   **ChatClient** là ứng dụng **Windows Forms**, nên nó **không thể chạy bên trong Docker Linux Container**. Đó là lý do bạn chỉ chạy Server bằng Docker, còn Client thì chạy lệnh `dotnet run` ở ngoài.
+*   Server chạy qua Docker sẽ map port `5000` ra máy chủ (localhost), nên Client kết nối tới `127.0.0.1:5000` vẫn hoạt động bình thường.

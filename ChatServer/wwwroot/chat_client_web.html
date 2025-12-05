@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zalo Chat Ultimate - WEB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+
+    <style>
+        :root {
+            --primary: #0068ff;
+            --primary-light: #e5efff;
+            --bg: #eef0f1;
+            --white: #ffffff;
+            --gray: #72808e;
+            --border: #dbdbdb;
+            --gradient: linear-gradient(135deg, #0068ff, #b620e0);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; outline: none; }
+        body { background: var(--bg); height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        /* === LOGIN / REGISTER SCREEN === */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--gradient);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .auth-container {
+            background: white; width: 800px; height: 500px; border-radius: 15px;
+            display: flex; overflow: hidden; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .auth-banner {
+            flex: 1; background: url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop') center/cover;
+            position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white;
+        }
+        .auth-banner::after {
+            content: ''; position: absolute; inset: 0; background: rgba(0, 104, 255, 0.6);
+        }
+        .banner-content { position: relative; z-index: 2; text-align: center; padding: 20px; }
+        .banner-content h1 { font-size: 40px; margin-bottom: 10px; font-weight: bold; }
+        .banner-content p { font-size: 16px; opacity: 0.9; }
+
+        .auth-form-wrapper {
+            flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center; position: relative;
+        }
+        
+        .form-title { font-size: 28px; color: #333; margin-bottom: 30px; font-weight: bold; text-align: center; }
+        
+        .input-group { margin-bottom: 20px; position: relative; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        .input-group input {
+            width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px; transition: 0.3s;
+        }
+        .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+        .btn-auth {
+            width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 25px;
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-auth:hover { background: #005ae0; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,104,255,0.3); }
+
+        .switch-auth { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }
+        .switch-auth a { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+        .switch-auth a:hover { text-decoration: underline; }
+
+        .hidden { display: none !important; }
+
+        /* === APP UI (Hidden initially) === */
+        #app-container {
+            display: none; width: 100%; height: 100%; background: white; display: flex;
+        }
+
+        /* SIDEBAR */
+        #sidebar { width: 320px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
+        .search-wrap { display: flex; background: var(--bg); border-radius: 20px; padding: 5px 10px; align-items: center; }
+        .search-wrap input { border: none; background: transparent; flex: 1; padding: 8px; }
+        .search-wrap i { color: var(--gray); cursor: pointer; padding: 5px; }
+        
+        .list-header { padding: 15px 20px 5px; font-size: 13px; font-weight: bold; color: var(--gray); text-transform: uppercase; }
+        .user-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .user-item { display: flex; align-items: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; margin-bottom: 2px; }
+        .user-item:hover { background: var(--bg); }
+        .user-item.active { background: var(--primary-light); }
+        
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #ccc; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 18px; margin-right: 12px; position: relative; }
+        .status-dot { width: 12px; height: 12px; background: #2ecc71; border: 2px solid white; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+        .status-dot.offline { background: #ccc; }
+        
+        .user-info { flex: 1; overflow: hidden; }
+        .user-name { font-weight: 600; color: #333; margin-bottom: 3px; }
+        .user-last-msg { font-size: 13px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .request-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff8e1; margin-bottom: 5px; border-radius: 5px; }
+        .btn-accept { background: var(--primary); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+
+        /* MAIN CHAT */
+        #main-chat { flex: 1; display: flex; flex-direction: column; background: #f5f7fa; }
+        .chat-header { padding: 15px 20px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; height: 70px; }
+        .chat-title h3 { margin: 0; font-size: 18px; }
+        .chat-title span { font-size: 13px; color: #2ecc71; }
+
+        #messagesList { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 2px; }
+
+        .msg-row { display: flex; align-items: flex-end; margin-bottom: 5px; }
+        .msg-row.mine { justify-content: flex-end; }
+        .msg-content { max-width: 65%; display: flex; flex-direction: column; }
+        .msg-row.mine .msg-content { align-items: flex-end; }
+
+        .bubble { padding: 10px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .msg-row:not(.mine) .bubble { background: white; color: #333; border-bottom-left-radius: 4px; }
+        .msg-row.mine .bubble { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+
+        .msg-avatar-small { width: 28px; height: 28px; border-radius: 50%; background: #ccc; margin-right: 8px; font-size: 10px; display: flex; justify-content: center; align-items: center; color: white; }
+        .msg-time { font-size: 11px; color: #999; margin-top: 3px; padding: 0 5px; }
+        
+        .input-area { padding: 15px 20px; background: white; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+        .tool-btn { font-size: 20px; color: var(--gray); cursor: pointer; border: none; background: none; transition: 0.2s; }
+        .tool-btn:hover { color: var(--primary); }
+        .input-wrapper { flex: 1; background: var(--bg); border-radius: 25px; padding: 0 15px; display: flex; align-items: center; height: 45px; }
+        .input-wrapper input { flex: 1; border: none; background: transparent; font-size: 15px; height: 100%; }
+        .btn-send { width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: white; border: none; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .msg-img { max-width: 200px; border-radius: 10px; cursor: pointer; border: 1px solid #eee; }
+        .msg-file { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 10px; text-decoration: none; color: inherit; }
+    </style>
+</head>
+<body>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen">
+        <div class="auth-container">
+            <div class="auth-banner">
+                <div class="banner-content">
+                    <h1>Zalo Chat</h1>
+                    <p>Kết nối bạn bè, chia sẻ yêu thương.</p>
+                </div>
+            </div>
+            
+            <!-- LOGIN FORM -->
+            <div id="login-form" class="auth-form-wrapper">
+                <h2 class="form-title">Đăng Nhập</h2>
+                
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="loginUsername" placeholder="Tên tài khoản" />
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="loginPassword" placeholder="Mật khẩu" />
+                </div>
+                
+                <button class="btn-auth" onclick="processLogin()">ĐĂNG NHẬP</button>
+                
+                <div class="switch-auth">
+                    Chưa có tài khoản? <a onclick="toggleAuth('register')">Đăng ký ngay</a>
+                </div>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="register-form" class="auth-form-wrapper hidden">
+                <h2 class="form-title">Đăng Ký</h2>
+                
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="regUsername" placeholder="Tên tài khoản" />
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="regPassword" placeholder="Mật khẩu" />
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-check-circle"></i>
+                    <input type="password" id="regConfirmPassword" placeholder="Nhập lại mật khẩu" />
+                </div>
+                
+                <button class="btn-auth" onclick="processRegister()">ĐĂNG KÝ</button>
+                
+                <div class="switch-auth">
+                    Đã có tài khoản? <a onclick="toggleAuth('login')">Đăng nhập</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP UI -->
+    <div id="app-container">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <div class="search-wrap">
+                    <input type="text" id="friendInput" placeholder="Tìm bạn (Nhập User ID)..." />
+                    <i class="fas fa-user-plus" onclick="addFriend()" title="Thêm bạn"></i>
+                </div>
+            </div>
+
+            <div id="request-area"></div>
+
+            <div class="list-header">Danh bạ</div>
+            <div id="user-list" class="user-list"></div>
+        </aside>
+
+        <main id="main-chat">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <h3 id="chatTitle">Phòng Chat Chung</h3>
+                    <span id="chatStatus">● Trực tuyến</span>
+                </div>
+                <div>
+                    <button class="tool-btn"><i class="fas fa-phone"></i></button>
+                    <button class="tool-btn" style="margin-left: 15px;"><i class="fas fa-video"></i></button>
+                </div>
+            </div>
+
+            <div id="messagesList"></div>
+
+            <div class="input-area">
+                <input type="file" id="fileInput" style="display: none;" onchange="uploadFile()" />
+                <button class="tool-btn" onclick="document.getElementById('fileInput').click()"><i class="fas fa-paperclip"></i></button>
+                <button class="tool-btn"><i class="far fa-image"></i></button>
+                
+                <div class="input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Nhập tin nhắn..." onkeypress="handleChatKey(event)" />
+                </div>
+                
+                <button class="btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let connection = null;
+        let currentUser = "";
+        let currentChatTarget = "ALL";
+
+        // ==================== AUTH LOGIC ====================
+        function toggleAuth(mode) {
+            if (mode === 'register') {
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('register-form').classList.remove('hidden');
+            } else {
+                document.getElementById('register-form').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+            }
+        }
+
+        function processLogin() {
+            const u = document.getElementById("loginUsername").value.trim();
+            const p = document.getElementById("loginPassword").value.trim();
+            
+            if (!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
+            
+            // Ở đây bạn sẽ gọi API check Login. Vì chưa có API, ta giả lập thành công.
+            console.log(`Logging in: ${u}`);
+            startApp(u);
+        }
+
+        function processRegister() {
+            const u = document.getElementById("regUsername").value.trim();
+            const p = document.getElementById("regPassword").value.trim();
+            const cp = document.getElementById("regConfirmPassword").value.trim();
+
+            if (!u || !p) return alert("Vui lòng nhập đầy đủ thông tin!");
+            if (p !== cp) return alert("Mật khẩu nhập lại không khớp!");
+
+            // Ở đây gọi API Register. Giả lập thành công.
+            alert("Đăng ký thành công! Đang đăng nhập...");
+            startApp(u);
+        }
+
+        async function startApp(username) {
+            currentUser = username;
+            document.getElementById("auth-screen").style.display = "none";
+            document.getElementById("app-container").style.display = "flex";
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/chatHub")
+                .withAutomaticReconnect()
+                .build();
+
+            // REGISTER EVENTS
+            connection.on("ReceiveMessage", (msg) => {
+                if(currentChatTarget === "ALL") renderMessage(msg);
+            });
+
+            connection.on("ReceivePrivateMessage", (msg) => {
+                if(currentChatTarget === msg.senderName || msg.senderName === currentUser) {
+                    renderMessage(msg);
+                }
+            });
+
+            connection.on("UpdateFriendList", (friends) => renderFriends(friends));
+            connection.on("UpdateFriendRequests", (reqs) => renderRequests(reqs));
+            connection.on("LoadHistory", (history) => {
+                document.getElementById("messagesList").innerHTML = "";
+                history.forEach(msg => renderMessage(msg));
+                scrollToBottom();
+            });
+            connection.on("Error", (err) => alert(err));
+
+            try {
+                await connection.start();
+                await connection.invoke("RegisterConnection", currentUser);
+            } catch (err) {
+                alert("Lỗi kết nối Server!");
+            }
+        }
+
+        // ==================== UI & LOGIC ====================
+        function stringToColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            let color = '#';
+            for (let i = 0; i < 3; i++) {
+                let value = (hash >> (i * 8)) & 0xFF;
+                color += ('00' + value.toString(16)).substr(-2);
+            }
+            return color;
+        }
+
+        function renderFriends(friends) {
+            const list = document.getElementById("user-list");
+            list.innerHTML = "";
+            const activeClass = currentChatTarget === "ALL" ? "active" : "";
+            list.innerHTML += `
+                <div class="user-item ${activeClass}" onclick="switchChat('ALL')">
+                    <div class="avatar" style="background: #0068ff;"><i class="fas fa-users"></i></div>
+                    <div class="user-info"><div class="user-name">Phòng Chat Chung</div><div class="user-last-msg">Mọi người</div></div>
+                </div>`;
+
+            friends.forEach(f => {
+                const isActive = currentChatTarget === f.username ? "active" : "";
+                const statusClass = f.isOnline ? "" : "offline";
+                const bg = stringToColor(f.username);
+                list.innerHTML += `
+                    <div class="user-item ${isActive}" onclick="switchChat('${f.username}')">
+                        <div class="avatar" style="background: ${bg}">${f.username[0].toUpperCase()}<div class="status-dot ${statusClass}"></div></div>
+                        <div class="user-info"><div class="user-name">${f.username}</div><div class="user-last-msg">${f.isOnline ? 'Online' : 'Offline'}</div></div>
+                    </div>`;
+            });
+        }
+
+        function renderRequests(requests) {
+            const area = document.getElementById("request-area");
+            area.innerHTML = "";
+            if(requests.length > 0) {
+                area.innerHTML = `<div class="list-header">Lời mời kết bạn</div>`;
+                requests.forEach(req => {
+                    area.innerHTML += `<div class="request-item"><div><b>${req}</b> muốn kết bạn</div><button class="btn-accept" onclick="acceptFriend('${req}')">Đồng ý</button></div>`;
+                });
+            }
+        }
+
+        function renderMessage(msg) {
+            const list = document.getElementById("messagesList");
+            const isMine = msg.senderName === currentUser;
+            const rowClass = isMine ? "msg-row mine" : "msg-row";
+            const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            let contentHtml = msg.content;
+            if (msg.type === 1) contentHtml = `<img src="${msg.content}" class="msg-img" onclick="window.open('${msg.content}')" />`;
+            else if (msg.type === 2) contentHtml = `<a href="${msg.content}" target="_blank" class="msg-file"><i class="fas fa-file-alt"></i> ${msg.attachmentName || "File"}</a>`;
+
+            let avatarHtml = !isMine ? `<div class="msg-avatar-small" style="background: ${stringToColor(msg.senderName)}">${msg.senderName[0].toUpperCase()}</div>` : "";
+
+            const html = `<div class="${rowClass}">${avatarHtml}<div class="msg-content"><div class="bubble">${contentHtml}</div><div class="msg-time">${time}</div></div></div>`;
+            list.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const list = document.getElementById("messagesList");
+            list.scrollTop = list.scrollHeight;
+        }
+
+        function switchChat(target) {
+            currentChatTarget = target;
+            document.getElementById("chatTitle").innerText = target === "ALL" ? "Phòng Chat Chung" : target;
+            document.getElementById("messagesList").innerHTML = "";
+            document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
+            connection.invoke("LoadMessageHistory", currentUser, target);
+            // Note: Render list again to update active class, or handle class toggle here manually
+        }
+
+        function handleChatKey(e) { if(e.key === 'Enter') sendMessage(); }
+
+        function sendMessage() {
+            const input = document.getElementById("messageInput");
+            const text = input.value.trim();
+            if(!text) return;
+            connection.invoke("SendMessage", currentUser, currentChatTarget, text, 0, "").catch(err => console.error(err));
+            input.value = "";
+        }
+
+        function addFriend() {
+            const target = document.getElementById("friendInput").value.trim();
+            if(target && target !== currentUser) {
+                connection.invoke("SendFriendRequest", currentUser, target);
+                document.getElementById("friendInput").value = "";
+                alert("Đã gửi lời mời!");
+            }
+        }
+
+        function acceptFriend(requester) { connection.invoke("AcceptFriendRequest", currentUser, requester); }
+
+        function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            if(fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                const type = file.type.startsWith('image/') ? 1 : 2;
+                if(base64.length > 50000) { alert("File quá lớn cho Demo Base64."); return; }
+                connection.invoke("SendMessage", currentUser, currentChatTarget, base64, type, file.name);
+            };
+            reader.readAsDataURL(file);
+            fileInput.value = "";
+        }
+    </script>
+</body>
+</html>

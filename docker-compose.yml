@@ -1,0 +1,34 @@
+services:
+  # =====================================================
+  # DATABASE SERVICE (SQL SERVER)
+  # =====================================================
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: zalo_chat_db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=ZaloChat@123
+    ports:
+      - "1433:1433"
+    volumes:
+      - db_data:/var/opt/mssql
+    restart: always
+
+  # =====================================================
+  # SERVER SERVICE
+  # =====================================================
+  chat-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zalo_chat_server
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ZaloChatDB;User Id=sa;Password=ZaloChat@123;TrustServerCertificate=True;
+    restart: always
+
+volumes:
+  db_data:

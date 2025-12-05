@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zalo Desktop Client</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+
+    <style>
+        :root {
+            --sidebar-bg: #f7f7f7;
+            --main-bg: #ffffff;
+            --accent-color: #005ae0; /* Zalo Blue */
+            --text-color: #333;
+            --border-color: #e0e0e0;
+            --bubble-mine: #e3f2fd;
+            --bubble-theirs: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; user-select: none; }
+        
+        body { height: 100vh; overflow: hidden; display: flex; background: var(--main-bg); color: var(--text-color); }
+
+        /* === LOGIN MODAL === */
+        #login-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95); z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .login-card {
+            background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 320px; text-align: center; border: 1px solid #eee;
+        }
+        .login-card h2 { margin-bottom: 20px; color: var(--accent-color); }
+        .login-card input {
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; outline: none;
+        }
+        .login-card input:focus { border-color: var(--accent-color); }
+        .login-card button {
+            width: 100%; padding: 12px; background: var(--accent-color); color: white; border: none; border-radius: 4px;
+            font-weight: bold; cursor: pointer; transition: background 0.2s;
+        }
+        .login-card button:hover { background: #0048b3; }
+
+        /* === SIDEBAR === */
+        #sidebar {
+            width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border-color);
+            display: flex; flex-direction: column;
+        }
+        
+        /* User Profile (Top Sidebar) */
+        .my-profile {
+            padding: 15px; display: flex; align-items: center; border-bottom: 1px solid var(--border-color);
+            background: #fff;
+        }
+        .my-avatar {
+            width: 40px; height: 40px; background: var(--accent-color); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px;
+        }
+
+        /* Search & Add Friend */
+        .search-area { padding: 10px; border-bottom: 1px solid var(--border-color); display: flex; gap: 5px; }
+        .search-area input {
+            flex: 1; padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
+        }
+        .btn-icon {
+            width: 32px; height: 32px; background: #fff; border: 1px solid #ccc; border-radius: 4px;
+            cursor: pointer; color: #666; display: flex; align-items: center; justify-content: center;
+        }
+        .btn-icon:hover { color: var(--accent-color); border-color: var(--accent-color); }
+
+        /* Lists */
+        .list-section { flex: 1; overflow-y: auto; }
+        .section-header {
+            padding: 10px 15px 5px; font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase;
+        }
+
+        .friend-item {
+            padding: 10px 15px; display: flex; align-items: center; cursor: pointer; transition: background 0.1s;
+        }
+        .friend-item:hover { background: #eaeaea; }
+        .friend-item.active { background: #cce5ff; }
+        
+        .f-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: #ccc; margin-right: 10px;
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; position: relative;
+        }
+        .status-dot {
+            width: 10px; height: 10px; background: #2ecc71; border: 2px solid var(--sidebar-bg); border-radius: 50%;
+            position: absolute; bottom: 0; right: 0;
+        }
+        .status-dot.offline { background: #aaa; }
+
+        .f-info { flex: 1; overflow: hidden; }
+        .f-name { font-size: 14px; font-weight: 600; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .f-status { font-size: 12px; color: #888; }
+
+        /* Request Item */
+        .req-item {
+            padding: 8px 15px; background: #fffbe6; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center; font-size: 13px;
+        }
+        .btn-accept {
+            padding: 4px 8px; background: var(--accent-color); color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 11px;
+        }
+
+        /* === MAIN CHAT === */
+        #main-area { flex: 1; display: flex; flex-direction: column; background: #f2f2f2; }
+
+        /* Header */
+        .chat-header {
+            height: 60px; background: #fff; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 20px; justify-content: space-between;
+        }
+        .chat-title { font-size: 18px; font-weight: bold; color: #333; }
+
+        /* Messages */
+        #msg-list {
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 5px;
+        }
+
+        .msg-row { display: flex; margin-bottom: 5px; align-items: flex-end; }
+        .msg-row.mine { justify-content: flex-end; }
+
+        .msg-avatar {
+            width: 30px; height: 30px; border-radius: 50%; background: #999; color: white;
+            display: flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 8px;
+        }
+        
+        .bubble {
+            max-width: 70%; padding: 8px 12px; border-radius: 8px; font-size: 14px; line-height: 1.4;
+            position: relative; word-wrap: break-word; user-select: text;
+        }
+        
+        .msg-row:not(.mine) .bubble { background: var(--bubble-theirs); border: 1px solid #e5e5e5; }
+        .msg-row.mine .bubble { background: var(--bubble-mine); border: 1px solid #cce0ff; }
+        
+        .msg-img { max-width: 250px; border-radius: 5px; cursor: pointer; border: 1px solid #ccc; }
+        .msg-file-link { color: var(--accent-color); text-decoration: none; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+
+        /* Input */
+        .input-area {
+            background: #fff; padding: 15px; border-top: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .toolbar-btn {
+            font-size: 20px; color: #666; cursor: pointer; padding: 5px; border: none; background: none;
+        }
+        .toolbar-btn:hover { color: var(--accent-color); }
+
+        .chat-input {
+            flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; outline: none;
+        }
+        .chat-input:focus { border-color: var(--accent-color); }
+        
+        .send-btn {
+            padding: 8px 15px; background: var(--accent-color); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;
+        }
+        .send-btn:hover { background: #0048b3; }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal">
+        <div class="login-card">
+            <h2>Zalo Desktop</h2>
+            <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Đăng nhập để kết nối với bạn bè</p>
+            <input type="text" id="username" placeholder="Nhập tên hiển thị..." onkeypress="if(event.key==='Enter') doLogin()" />
+            <button onclick="doLogin()">ĐĂNG NHẬP</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <div class="my-profile">
+            <div class="my-avatar" id="myAvatarDisp">?</div>
+            <div style="font-weight: 600;" id="myNameDisp">Chưa đăng nhập</div>
+        </div>
+
+        <div class="search-area">
+            <input type="text" id="friendSearch" placeholder="Tìm bạn bè (User ID)..." />
+            <button class="btn-icon" onclick="addFriend()" title="Thêm bạn"><i class="fas fa-user-plus"></i></button>
+        </div>
+
+        <div class="list-section">
+            <div id="req-list"></div> <!-- Lời mời kết bạn -->
+            
+            <div class="section-header">Hội thoại</div>
+            <div id="friend-list">
+                <!-- Danh sách bạn bè sẽ render ở đây -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CHAT AREA -->
+    <div id="main-area">
+        <div class="chat-header">
+            <div class="chat-title" id="chatTargetName">Public Chat</div>
+            <div style="color: #666;">
+                <i class="fas fa-phone-alt" style="margin-right: 15px; cursor: pointer;"></i>
+                <i class="fas fa-video" style="cursor: pointer;"></i>
+            </div>
+        </div>
+
+        <div id="msg-list">
+            <!-- Tin nhắn sẽ render ở đây -->
+        </div>
+
+        <div class="input-area">
+            <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload()" />
+            <button class="toolbar-btn" onclick="document.getElementById('fileInput').click()" title="Gửi File/Ảnh"><i class="fas fa-paperclip"></i></button>
+            
+            <input type="text" class="chat-input" id="msgInput" placeholder="Nhập tin nhắn @..." onkeypress="if(event.key==='Enter') sendMsg()" />
+            <button class="send-btn" onclick="sendMsg()">GỬI</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG & STATE ---
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .withAutomaticReconnect()
+            .build();
+
+        let currentUser = "";
+        let currentTarget = "ALL";
+
+        // --- LOGIN LOGIC ---
+        async function doLogin() {
+            const user = document.getElementById("username").value.trim();
+            if(!user) return alert("Vui lòng nhập tên!");
+
+            try {
+                currentUser = user;
+                await connection.start();
+                await connection.invoke("RegisterConnection", currentUser);
+                
+                // Update UI
+                document.getElementById("login-modal").style.display = "none";
+                document.getElementById("myNameDisp").innerText = currentUser;
+                document.getElementById("myAvatarDisp").innerText = currentUser[0].toUpperCase();
+                
+            } catch (err) {
+                alert("Lỗi kết nối: " + err);
+            }
+        }
+
+        // --- SIGNALR EVENTS ---
+        connection.on("ReceiveMessage", (msg) => {
+            if (currentTarget === "ALL") appendMessage(msg);
+        });
+
+        connection.on("ReceivePrivateMessage", (msg) => {
+            if (msg.senderName === currentTarget || msg.senderName === currentUser) {
+                appendMessage(msg);
+            } else {
+                // TODO: Highlight friend in list
+                console.log(`New message from ${msg.senderName}`);
+            }
+        });
+
+        connection.on("UpdateFriendList", (friends) => renderFriendList(friends));
+        
+        connection.on("UpdateFriendRequests", (reqs) => {
+            const div = document.getElementById("req-list");
+            div.innerHTML = "";
+            if(reqs.length > 0) {
+                div.innerHTML = `<div class="section-header">Lời mời kết bạn</div>`;
+                reqs.forEach(r => {
+                    div.innerHTML += `
+                        <div class="req-item">
+                            <span><b>${r}</b></span>
+                            <button class="btn-accept" onclick="acceptRequest('${r}')">Đồng ý</button>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        connection.on("LoadHistory", (msgs) => {
+            const list = document.getElementById("msg-list");
+            list.innerHTML = "";
+            msgs.forEach(m => appendMessage(m));
+            scrollToBottom();
+        });
+
+        // --- UI FUNCTIONS ---
+        function renderFriendList(friends) {
+            const list = document.getElementById("friend-list");
+            list.innerHTML = "";
+
+            // 1. Public Room Item
+            const activeClass = currentTarget === "ALL" ? "active" : "";
+            list.innerHTML += `
+                <div class="friend-item ${activeClass}" onclick="switchChat('ALL')">
+                    <div class="f-avatar" style="background: #005ae0;"><i class="fas fa-users"></i></div>
+                    <div class="f-info">
+                        <div class="f-name">Public Chat</div>
+                        <div class="f-status">Phòng chat chung</div>
+                    </div>
+                </div>
+            `;
+
+            // 2. Friend Items
+            friends.forEach(f => {
+                const isActive = currentTarget === f.username ? "active" : "";
+                const initial = f.username[0].toUpperCase();
+                const statusColor = f.isOnline ? "" : "offline"; // CSS handles color
+                const statusText = f.isOnline ? "Online" : "Offline";
+                const bg = stringToColor(f.username);
+
+                list.innerHTML += `
+                    <div class="friend-item ${isActive}" onclick="switchChat('${f.username}')">
+                        <div class="f-avatar" style="background: ${bg}">
+                            ${initial}
+                            <div class="status-dot ${statusColor}"></div>
+                        </div>
+                        <div class="f-info">
+                            <div class="f-name">${f.username}</div>
+                            <div class="f-status">${statusText}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function switchChat(target) {
+            currentTarget = target;
+            document.getElementById("chatTargetName").innerText = target === "ALL" ? "Public Chat" : target;
+            
+            // Visual selection update
+            document.querySelectorAll('.friend-item').forEach(el => el.classList.remove('active'));
+            // (In full app, find element by ID and add active class. Here we trigger re-render or just reload history)
+            
+            document.getElementById("msg-list").innerHTML = ""; // Clear
+            connection.invoke("LoadMessageHistory", currentUser, target);
+        }
+
+        function appendMessage(msg) {
+            const list = document.getElementById("msg-list");
+            const isMine = msg.senderName === currentUser;
+            
+            let content = msg.content;
+            
+            // Handle Types
+            if (msg.type === 1) { // Image
+                content = `<img src="${msg.content}" class="msg-img" onclick="window.open(this.src)" />`;
+            } else if (msg.type === 2) { // File
+                content = `<a href="${msg.content}" target="_blank" class="msg-file-link"><i class="fas fa-file-download"></i> ${msg.attachmentName}</a>`;
+            }
+
+            const avatarHtml = !isMine ? 
+                `<div class="msg-avatar" style="background: ${stringToColor(msg.senderName)}">${msg.senderName[0].toUpperCase()}</div>` : "";
+
+            const html = `
+                <div class="msg-row ${isMine ? 'mine' : ''}">
+                    ${avatarHtml}
+                    <div class="bubble">
+                        ${!isMine ? `<div style="font-size:10px; color:#888; margin-bottom:2px;">${msg.senderName}</div>` : ''}
+                        ${content}
+                    </div>
+                </div>
+            `;
+            
+            list.insertAdjacentHTML('beforeend', html);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const list = document.getElementById("msg-list");
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // --- ACTIONS ---
+        function sendMsg() {
+            const inp = document.getElementById("msgInput");
+            const txt = inp.value.trim();
+            if (!txt) return;
+            
+            connection.invoke("SendMessage", currentUser, currentTarget, txt, 0, "")
+                .catch(e => console.error(e));
+            inp.value = "";
+        }
+
+        function addFriend() {
+            const target = document.getElementById("friendSearch").value.trim();
+            if(target && target !== currentUser) {
+                connection.invoke("SendFriendRequest", currentUser, target);
+                document.getElementById("friendSearch").value = "";
+                alert("Đã gửi lời mời!");
+            }
+        }
+
+        function acceptRequest(requester) {
+            connection.invoke("AcceptFriendRequest", currentUser, requester);
+        }
+
+        function handleFileUpload() {
+            const file = document.getElementById("fileInput").files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                const type = file.type.startsWith("image") ? 1 : 2;
+                
+                if(base64.length > 50000) {
+                    alert("Demo Mode: Chỉ hỗ trợ file < 50KB qua Base64.");
+                    return;
+                }
+
+                connection.invoke("SendMessage", currentUser, currentTarget, base64, type, file.name);
+            };
+            reader.readAsDataURL(file);
+            document.getElementById("fileInput").value = ""; // Reset
+        }
+
+        // --- UTILS ---
+        function stringToColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            let color = '#';
+            for (let i = 0; i < 3; i++) {
+                let value = (hash >> (i * 8)) & 0xFF;
+                color += ('00' + value.toString(16)).substr(-2);
+            }
+            return color;
+        }
+    </script>
+</body>
+</html>

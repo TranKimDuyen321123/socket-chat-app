@@ -6,9 +6,5 @@
   <PropertyGroup>
     <ActiveDebugProfile>ChatServer</ActiveDebugProfile>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Update="ServerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-  </ItemGroup>
+  <ItemGroup />
 </Project>
